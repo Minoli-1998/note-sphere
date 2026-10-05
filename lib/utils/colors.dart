@@ -4,7 +4,7 @@ class AppColors {
   // primary colors
   static Color kBgColor = Color(0xff202326);
   static Color kFabColor = Color.fromARGB(255, 204, 17, 237);
-  static Color kCardColor = Color(0xff2f3225);
+  static Color kCardColor = Color(0xff2F3235);
   static Color kWhiteColor = Colors.white;
 
   // gradient colors

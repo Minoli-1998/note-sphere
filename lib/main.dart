@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:note_sphere/utils/router.dart';
+import 'package:note_sphere/utils/theme_data.dart';
 
 void main() {
   runApp(MyApp());
@@ -13,6 +14,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp.router(
       title: "NoteSphere",
       debugShowCheckedModeBanner: false,
+      theme: ThemeClass.darkTheme,
       routerConfig: AppRouter.router,
     );
   }
