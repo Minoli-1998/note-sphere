@@ -74,4 +74,19 @@ class NoteService {
 
     return notesByCategory;
   }
+
+  // method to get the notes according to the category
+  Future<List<Note>> getNotesByCategoryName(String category) async {
+    final dynamic allNotes = await _myBox.get("notes");
+
+    final List<Note> notesByCategory = [];
+
+    for (final note in allNotes) {
+      if (note.category == category) {
+        notesByCategory.add(note);
+      }
+    }
+
+    return notesByCategory;
+  }
 }
