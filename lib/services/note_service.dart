@@ -89,4 +89,47 @@ class NoteService {
 
     return notesByCategory;
   }
+
+  // method to edit a note
+  // the parameter passing contains the updated information
+  // using the id of the note find the note going to edit and assign the values of that note with the updated information
+  Future<void> editNote(Note note) async {
+    try {
+      // get all notes from the box
+      final dynamic allNotes = await _myBox.get("notes");
+
+      // converting dynamic list to Note list
+      final List<Note> notes = allNotes.cast<Note>().toList();
+
+      // get the id of the note passing to edit
+      final int index = notes.indexWhere((element) => element.id == note.id);
+
+      // replace the existing note with updated note
+      notes[index] = note;
+
+      // save data in the box
+      await _myBox.put("notes", notes);
+    } catch (error) {
+      error.toString();
+    }
+  }
+
+  // method to delte a note
+  Future<void> deleteNote(String noteId) async {
+    try {
+      // get all notes from the box
+      final dynamic allNotes = await _myBox.get("notes");
+
+      // converting dynamic list to Note list
+      final List<Note> notes = allNotes.cast<Note>().toList();
+
+      // remove the note with the matching id
+      notes.removeWhere((element) => element.id == noteId);
+
+      // save updated list in the box
+      await _myBox.put("notes", notes);
+    } catch (error) {
+      print(error.toString());
+    }
+  }
 }
