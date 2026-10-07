@@ -8,6 +8,7 @@ class SingleCategoryNoteCard extends StatefulWidget {
   final String noteContent;
   final Future Function() removeNote;
   final Future Function() editNote;
+  final void Function() viewSingleNote;
 
   const SingleCategoryNoteCard({
     super.key,
@@ -15,6 +16,7 @@ class SingleCategoryNoteCard extends StatefulWidget {
     required this.noteContent,
     required this.removeNote,
     required this.editNote,
+    required this.viewSingleNote,
   });
 
   @override
@@ -57,24 +59,32 @@ class _SingleCategoryNoteCardState extends State<SingleCategoryNoteCard> {
 
           SizedBox(height: 20),
 
-          Text(
-            widget.noteTitle,
-            style: AppTextStyles.appSubTitle,
-            overflow: TextOverflow.ellipsis,
-            textAlign: TextAlign.left,
-            maxLines: 1,
-          ),
+          GestureDetector(
+            onTap: widget.viewSingleNote,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  widget.noteTitle,
+                  style: AppTextStyles.appSubTitle,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.left,
+                  maxLines: 1,
+                ),
 
-          SizedBox(height: 15),
+                SizedBox(height: 15),
 
-          Text(
-            widget.noteContent,
-            style: AppTextStyles.appDescriptionSmallStyle.copyWith(
-              color: AppColors.kWhiteColor.withValues(alpha: 0.5),
+                Text(
+                  widget.noteContent,
+                  style: AppTextStyles.appDescriptionSmallStyle.copyWith(
+                    color: AppColors.kWhiteColor.withValues(alpha: 0.5),
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.left,
+                  maxLines: 6,
+                ),
+              ],
             ),
-            overflow: TextOverflow.ellipsis,
-            textAlign: TextAlign.left,
-            maxLines: 6,
           ),
         ],
       ),

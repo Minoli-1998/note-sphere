@@ -51,6 +51,10 @@ class _NotesByCategoryState extends State<NotesByCategory> {
     }
   }
 
+  void _viewSinglePage(Note note) {
+    AppRouter.router.push('/single-note', extra: note);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -105,6 +109,7 @@ class _NotesByCategoryState extends State<NotesByCategory> {
                       });
                     },
                     editNote: () async => _editNote(note),
+                    viewSingleNote: () => _viewSinglePage(note),
                   );
                 },
               ),

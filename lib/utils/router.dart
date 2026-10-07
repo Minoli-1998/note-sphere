@@ -5,6 +5,7 @@ import 'package:note_sphere/pages/create_new_note.dart';
 import 'package:note_sphere/pages/home_page.dart';
 import 'package:note_sphere/pages/notes_by_category.dart';
 import 'package:note_sphere/pages/notes_page.dart';
+import 'package:note_sphere/pages/single_note_page.dart';
 import 'package:note_sphere/pages/tasks_page.dart';
 import 'package:note_sphere/pages/update_note_page.dart';
 
@@ -68,6 +69,16 @@ class AppRouter {
         builder: (context, state) {
           final Note note = state.extra as Note;
           return UpdateNotePage(note: note);
+        },
+      ),
+
+      // single note page
+      GoRoute(
+        name: "single note",
+        path: '/single-note',
+        builder: (context, state) {
+          final Note note = state.extra as Note;
+          return SingleNotePage(note: note);
         },
       ),
     ],
