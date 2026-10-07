@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:note_sphere/helpers/snackbar.dart';
 import 'package:note_sphere/models/note_model.dart';
 import 'package:note_sphere/services/note_service.dart';
 import 'package:note_sphere/utils/constants.dart';
@@ -30,6 +31,24 @@ class _NotesByCategoryState extends State<NotesByCategory> {
   Future<void> _loadNotesByCategory() async {
     notes = await noteService.getNotesByCategoryName(widget.category);
     setState(() {});
+  }
+
+  void _editNote(Note note) {
+    AppRouter.router.push('/edit-note', extra: note);
+  }
+
+  Future<void> _removeNote(String id) async {
+    try {
+      await noteService.deleteNote(id);
+
+      if (context.mounted) {
+        AppHelpers.showSnackBarMessage(context, "Note deleted successfully");
+      }
+    } catch (error) {
+      if (context.mounted) {
+        AppHelpers.showSnackBarMessage(context, "Failed to delete note");
+      }
+    }
   }
 
   @override
@@ -78,8 +97,14 @@ class _NotesByCategoryState extends State<NotesByCategory> {
                   return SingleCategoryNoteCard(
                     noteTitle: note.title,
                     noteContent: note.content,
-                    removeNote: () async {},
-                    editNote: () async {},
+                    removeNote: () async {
+                      await _removeNote(note.id);
+
+                      setState(() {
+                        notes.removeAt(index);
+                      });
+                    },
+                    editNote: () async => _editNote(note),
                   );
                 },
               ),

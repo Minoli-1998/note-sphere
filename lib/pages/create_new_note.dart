@@ -179,6 +179,10 @@ class _CreateNewNoteState extends State<CreateNewNote> {
                               onChanged: (String? value) {
                                 setState(() {
                                   category = value!;
+
+                                  if (!categories.contains(category)) {
+                                    categories.add(category);
+                                  }
                                 });
                               },
                             ),
