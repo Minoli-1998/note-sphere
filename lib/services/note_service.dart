@@ -90,6 +90,25 @@ class NoteService {
     return notesByCategory;
   }
 
+  // method to add a note
+  Future<void> addNote(Note note) async {
+    try {
+      // get all notes from box
+      final List<dynamic> allNotes = _myBox.get("notes") ?? [];
+
+      // converting to List<Note> type
+      final List<Note> notes = allNotes.cast<Note>().toList();
+
+      // add to the list
+      notes.add(note);
+
+      // save in box
+      await _myBox.put("notes", notes);
+    } catch (error) {
+      error.toString();
+    }
+  }
+
   // method to edit a note
   // the parameter passing contains the updated information
   // using the id of the note find the note going to edit and assign the values of that note with the updated information

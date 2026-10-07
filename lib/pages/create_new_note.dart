@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:note_sphere/helpers/snackbar.dart';
+import 'package:note_sphere/models/note_model.dart';
 import 'package:note_sphere/services/note_service.dart';
 import 'package:note_sphere/utils/colors.dart';
 import 'package:note_sphere/utils/constants.dart';
+import 'package:note_sphere/utils/router.dart';
 import 'package:note_sphere/utils/text_styles.dart';
+import 'package:uuid/uuid.dart';
 
 class CreateNewNote extends StatefulWidget {
   final bool isNewCategory;
@@ -19,18 +23,40 @@ class _CreateNewNoteState extends State<CreateNewNote> {
 
   List<String> categories = [];
 
-  String category = "Category";
-
   // get all categories
-  Future<List<String>> _getAllCategories() async {
-    categories = await noteService.getAllCategories();
-    return categories;
+  Future<void> _getAllCategories() async {
+    final loadedCategories = await noteService.getAllCategories();
+    if (mounted) {
+      setState(() {
+        categories = loadedCategories;
+      });
+    }
   }
 
   @override
   void initState() {
     super.initState();
     _getAllCategories();
+  }
+
+  // variables form
+  final _formKey = GlobalKey<FormState>();
+
+  // controllers
+  final TextEditingController _noteTitleController = TextEditingController();
+  final TextEditingController _noteContentController = TextEditingController();
+  final TextEditingController _newCategoryController = TextEditingController();
+
+  // variable to store drop down value
+  String category = "";
+
+  // dispose values
+  @override
+  void dispose() {
+    super.dispose();
+    _noteTitleController.dispose();
+    _noteContentController.dispose();
+    _newCategoryController.dispose();
   }
 
   @override
@@ -47,6 +73,7 @@ class _CreateNewNoteState extends State<CreateNewNote> {
                 horizontal: AppConstants.kDefaultPadding / 2,
               ),
               child: Form(
+                key: _formKey,
                 child: Column(
                   children: [
                     // drop down
@@ -56,6 +83,13 @@ class _CreateNewNoteState extends State<CreateNewNote> {
                               borderRadius: BorderRadius.circular(10),
                             ),
                             child: TextFormField(
+                              controller: _newCategoryController,
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return "Please enter the category";
+                                }
+                                return null;
+                              },
                               style: TextStyle(
                                 color: AppColors.kWhiteColor,
                                 fontFamily: GoogleFonts.dmSans().fontFamily,
@@ -89,6 +123,11 @@ class _CreateNewNoteState extends State<CreateNewNote> {
                                   ),
                                 ),
                               ),
+                              onFieldSubmitted: (value) {
+                                setState(() {
+                                  category = value;
+                                });
+                              },
                             ),
                           )
                         : Container(
@@ -96,6 +135,12 @@ class _CreateNewNoteState extends State<CreateNewNote> {
                               borderRadius: BorderRadius.circular(10),
                             ),
                             child: DropdownButtonFormField(
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return "Please select the category";
+                                }
+                                return null;
+                              },
                               style: TextStyle(
                                 color: AppColors.kWhiteColor,
                                 fontFamily: GoogleFonts.dmSans().fontFamily,
@@ -131,9 +176,9 @@ class _CreateNewNoteState extends State<CreateNewNote> {
                                 );
                               }).toList(),
                               alignment: AlignmentGeometry.centerLeft,
-                              onChanged: (value) {
+                              onChanged: (String? value) {
                                 setState(() {
-                                  category = value as String;
+                                  category = value!;
                                 });
                               },
                             ),
@@ -143,6 +188,13 @@ class _CreateNewNoteState extends State<CreateNewNote> {
 
                     // title field
                     TextFormField(
+                      controller: _noteTitleController,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return "Please enter note title";
+                        }
+                        return null;
+                      },
                       maxLines: 2,
                       style: TextStyle(
                         color: AppColors.kWhiteColor.withValues(alpha: 0.5),
@@ -164,6 +216,13 @@ class _CreateNewNoteState extends State<CreateNewNote> {
 
                     // content field
                     TextFormField(
+                      controller: _noteContentController,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return "Please enter note content";
+                        }
+                        return null;
+                      },
                       maxLines: 12,
                       style: TextStyle(
                         color: AppColors.kWhiteColor.withValues(alpha: 0.5),
@@ -193,7 +252,44 @@ class _CreateNewNoteState extends State<CreateNewNote> {
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         ElevatedButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            // validate the form
+                            if (_formKey.currentState!.validate()) {
+                              // save the note
+                              try {
+                                noteService.addNote(
+                                  Note(
+                                    title: _noteTitleController.text,
+                                    category: widget.isNewCategory
+                                        ? _newCategoryController.text
+                                        : category,
+                                    content: _noteContentController.text,
+                                    date: DateTime.now(),
+                                    id: Uuid().v4(),
+                                  ),
+                                );
+
+                                // display message
+                                AppHelpers.showSnackBarMessage(
+                                  context,
+                                  "Note saved successfully",
+                                );
+
+                                // clear fields
+                                _newCategoryController.clear();
+                                _noteContentController.clear();
+                                _noteTitleController.clear();
+
+                                // navigate to notes page
+                                AppRouter.router.go('/notes');
+                              } catch (error) {
+                                AppHelpers.showSnackBarMessage(
+                                  context,
+                                  "Error occured while saving note",
+                                );
+                              }
+                            }
+                          },
                           style: ButtonStyle(
                             backgroundColor: WidgetStatePropertyAll(
                               AppColors.kFabColor,
