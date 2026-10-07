@@ -129,7 +129,27 @@ class NoteService {
       // save updated list in the box
       await _myBox.put("notes", notes);
     } catch (error) {
-      print(error.toString());
+      error.toString();
     }
+  }
+
+  // method to get all categories
+  Future<List<String>> getAllCategories() async {
+    List<String> categories = [];
+
+    // get all notes from box
+    final dynamic allNotes = _myBox.get("notes") ?? [];
+
+    // converting to Note type
+    final List<Note> notes = allNotes.cast<Note>().toList();
+
+    // add the categories in list if not duplicated
+    for (Note note in notes) {
+      if (!categories.contains(note.category)) {
+        categories.add(note.category);
+      }
+    }
+
+    return categories;
   }
 }
