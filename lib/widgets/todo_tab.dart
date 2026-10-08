@@ -4,6 +4,7 @@ import 'package:note_sphere/models/task_model.dart';
 import 'package:note_sphere/services/todo_service.dart';
 import 'package:note_sphere/utils/router.dart';
 import 'package:note_sphere/widgets/task_card.dart';
+import 'package:note_sphere/widgets/task_inherited_widget.dart';
 
 class TodoTab extends StatefulWidget {
   final List<Task> incompletedTasks;
@@ -62,43 +63,49 @@ class _TodoTabState extends State<TodoTab> {
       widget.incompletedTasks.sort((a, b) => a.time.compareTo(b.time));
     });
 
-    return Padding(
-      padding: EdgeInsetsGeometry.symmetric(horizontal: 10),
-      child: Column(
-        children: [
-          SizedBox(height: 20),
+    return TaskData(
+      tasks: widget.incompletedTasks,
 
-          // listview of incompleted tasks
-          Expanded(
-            child: ListView.builder(
-              itemCount: widget.incompletedTasks.length,
-              shrinkWrap: true,
-              physics: AlwaysScrollableScrollPhysics(),
-              itemBuilder: (context, index) {
-                Task incomepleted = widget.incompletedTasks[index];
+      // defining here is not necessary because it defined in top-levels
+      onTaskChanged: () {},
+      child: Padding(
+        padding: EdgeInsetsGeometry.symmetric(horizontal: 10),
+        child: Column(
+          children: [
+            SizedBox(height: 20),
 
-                return Dismissible(
-                  key: ValueKey(incomepleted.id.toString()),
-                  direction: DismissDirection.startToEnd,
-                  onDismissed: (direction) {
-                    setState(() {
-                      widget.incompletedTasks.removeAt(index);
-                      todoService.deleteTask(incomepleted);
-                    });
+            // listview of incompleted tasks
+            Expanded(
+              child: ListView.builder(
+                itemCount: widget.incompletedTasks.length,
+                shrinkWrap: true,
+                physics: AlwaysScrollableScrollPhysics(),
+                itemBuilder: (context, index) {
+                  Task incomepleted = widget.incompletedTasks[index];
 
-                    AppHelpers.showSnackBarMessage(context, "Task deleted");
-                  },
-                  child: TaskCard(
-                    isCompleted: false,
-                    incompletedTask: incomepleted,
-                    onCheckBoxChanged: () =>
-                        _markIncompletedTaskAsDone(incomepleted),
-                  ),
-                );
-              },
+                  return Dismissible(
+                    key: ValueKey(incomepleted.id.toString()),
+                    direction: DismissDirection.startToEnd,
+                    onDismissed: (direction) {
+                      setState(() {
+                        widget.incompletedTasks.removeAt(index);
+                        todoService.deleteTask(incomepleted);
+                      });
+
+                      AppHelpers.showSnackBarMessage(context, "Task deleted");
+                    },
+                    child: TaskCard(
+                      isCompleted: false,
+                      incompletedTask: incomepleted,
+                      onCheckBoxChanged: () =>
+                          _markIncompletedTaskAsDone(incomepleted),
+                    ),
+                  );
+                },
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

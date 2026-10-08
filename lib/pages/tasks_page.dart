@@ -6,6 +6,7 @@ import 'package:note_sphere/utils/colors.dart';
 import 'package:note_sphere/utils/router.dart';
 import 'package:note_sphere/utils/text_styles.dart';
 import 'package:note_sphere/widgets/completed_tab.dart';
+import 'package:note_sphere/widgets/task_inherited_widget.dart';
 import 'package:note_sphere/widgets/todo_tab.dart';
 
 class TasksPage extends StatefulWidget {
@@ -25,8 +26,8 @@ class _TasksPageState extends State<TasksPage>
   // dispose controllers
   @override
   void dispose() {
-    _taskController.dispose();
     _tabController.dispose();
+    _taskController.dispose();
     super.dispose();
   }
 
@@ -72,37 +73,33 @@ class _TasksPageState extends State<TasksPage>
   }
 
   // add task
-  void _addTask() async {
+  Future<void> _addTask() async {
     try {
-      if (_taskController.text.isNotEmpty) {
-        Task newTask = Task(
-          title: _taskController.text,
-          date: DateTime.now(),
-          time: DateTime.now(),
-          isDone: false,
-        );
+      if (_taskController.text.trim().isEmpty) {
+        return;
+      }
 
-        // add as a task using todoservice
-        await todoService.addTask(newTask);
+      final Task newTask = Task(
+        title: _taskController.text.trim(),
+        date: DateTime.now(),
+        time: DateTime.now(),
+        isDone: false,
+      );
 
-        // add to all tasks
-        setState(() {
-          allTasks.add(newTask);
-          incompletedTasks.add(newTask);
-        });
+      // Save task to Hive
+      await todoService.addTask(newTask);
 
-        // displaying a message
-        if (context.mounted) {
-          AppHelpers.showSnackBarMessage(
-            context,
-            "New task added successfully",
-          );
-        }
+      // Reload tasks from Hive
+      await _loadAllTasks();
 
-        // cleart text field
-        _taskController.clear();
+      // Clear text field
+      _taskController.clear();
 
+      // Close dialog first
+      if (context.mounted) {
         Navigator.pop(context);
+
+        AppHelpers.showSnackBarMessage(context, "New task added successfully");
       }
     } catch (error) {
       if (context.mounted) {
@@ -186,56 +183,60 @@ class _TasksPageState extends State<TasksPage>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        leading: IconButton(
-          onPressed: () {
-            // navigate to home page
-            AppRouter.router.go("/");
-          },
-          icon: Icon(Icons.arrow_back),
-        ),
-        bottom: TabBar(
-          controller: _tabController,
-          tabs: [
-            Tab(
-              child: Text(
-                "To-Do",
-                style: AppTextStyles.appDescriptionLargeStyle,
+    return TaskData(
+      tasks: allTasks,
+      onTaskChanged: () => _loadAllTasks(),
+      child: Scaffold(
+        appBar: AppBar(
+          automaticallyImplyLeading: false,
+          leading: IconButton(
+            onPressed: () {
+              // navigate to home page
+              AppRouter.router.go("/");
+            },
+            icon: Icon(Icons.arrow_back),
+          ),
+          bottom: TabBar(
+            controller: _tabController,
+            tabs: [
+              Tab(
+                child: Text(
+                  "To-Do",
+                  style: AppTextStyles.appDescriptionLargeStyle,
+                ),
               ),
-            ),
 
-            Tab(
-              child: Text(
-                "Completed",
-                style: AppTextStyles.appDescriptionLargeStyle,
+              Tab(
+                child: Text(
+                  "Completed",
+                  style: AppTextStyles.appDescriptionLargeStyle,
+                ),
               ),
+            ],
+          ),
+        ),
+
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            openMessageModal(context);
+          },
+          shape: CircleBorder(side: BorderSide(color: Colors.white, width: 1)),
+          child: Icon(Icons.add, color: AppColors.kWhiteColor, size: 30),
+        ),
+
+        body: TabBarView(
+          controller: _tabController,
+          children: [
+            TodoTab(
+              incompletedTasks: incompletedTasks,
+              completedTasks: completedTasks,
+            ),
+            CompletedTab(
+              completedTasks: completedTasks,
+              inCompletedTasks: incompletedTasks,
             ),
           ],
         ),
-      ),
-
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          openMessageModal(context);
-        },
-        shape: CircleBorder(side: BorderSide(color: Colors.white, width: 1)),
-        child: Icon(Icons.add, color: AppColors.kWhiteColor, size: 30),
-      ),
-
-      body: TabBarView(
-        controller: _tabController,
-        children: [
-          TodoTab(
-            incompletedTasks: incompletedTasks,
-            completedTasks: completedTasks,
-          ),
-          CompletedTab(
-            completedTasks: completedTasks,
-            inCompletedTasks: incompletedTasks,
-          ),
-        ],
       ),
     );
   }

@@ -4,6 +4,7 @@ import 'package:note_sphere/models/task_model.dart';
 import 'package:note_sphere/services/todo_service.dart';
 import 'package:note_sphere/utils/router.dart';
 import 'package:note_sphere/widgets/task_card.dart';
+import 'package:note_sphere/widgets/task_inherited_widget.dart';
 
 class CompletedTab extends StatefulWidget {
   final List<Task> completedTasks;
@@ -65,43 +66,47 @@ class _CompletedTabState extends State<CompletedTab> {
       widget.completedTasks.sort((a, b) => a.time.compareTo(b.time));
     });
 
-    return Padding(
-      padding: EdgeInsetsGeometry.symmetric(horizontal: 10),
-      child: Column(
-        children: [
-          SizedBox(height: 20),
+    return TaskData(
+      tasks: widget.completedTasks,
+      onTaskChanged: () {},
+      child: Padding(
+        padding: EdgeInsetsGeometry.symmetric(horizontal: 10),
+        child: Column(
+          children: [
+            SizedBox(height: 20),
 
-          // listview of incompleted tasks
-          Expanded(
-            child: ListView.builder(
-              itemCount: widget.completedTasks.length,
-              shrinkWrap: true,
-              physics: AlwaysScrollableScrollPhysics(),
-              itemBuilder: (context, index) {
-                Task completedTask = widget.completedTasks[index];
+            // listview of incompleted tasks
+            Expanded(
+              child: ListView.builder(
+                itemCount: widget.completedTasks.length,
+                shrinkWrap: true,
+                physics: AlwaysScrollableScrollPhysics(),
+                itemBuilder: (context, index) {
+                  Task completedTask = widget.completedTasks[index];
 
-                return Dismissible(
-                  key: ValueKey(completedTask.id.toString()),
-                  direction: DismissDirection.startToEnd,
-                  onDismissed: (direction) {
-                    setState(() {
-                      widget.completedTasks.removeAt(index);
-                      todoService.deleteTask(completedTask);
-                    });
+                  return Dismissible(
+                    key: ValueKey(completedTask.id.toString()),
+                    direction: DismissDirection.startToEnd,
+                    onDismissed: (direction) {
+                      setState(() {
+                        widget.completedTasks.removeAt(index);
+                        todoService.deleteTask(completedTask);
+                      });
 
-                    AppHelpers.showSnackBarMessage(context, "Task deleted");
-                  },
-                  child: TaskCard(
-                    isCompleted: true,
-                    incompletedTask: completedTask,
-                    onCheckBoxChanged: () =>
-                        _markCompletedTaskAsNotDone(completedTask),
-                  ),
-                );
-              },
+                      AppHelpers.showSnackBarMessage(context, "Task deleted");
+                    },
+                    child: TaskCard(
+                      isCompleted: true,
+                      incompletedTask: completedTask,
+                      onCheckBoxChanged: () =>
+                          _markCompletedTaskAsNotDone(completedTask),
+                    ),
+                  );
+                },
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

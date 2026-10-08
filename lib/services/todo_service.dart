@@ -81,7 +81,7 @@ class TodoService {
       tasks.add(task);
 
       // save in box
-      _myBox.put("tasks", tasks);
+      await _myBox.put("tasks", tasks);
     } catch (error) {
       error.toString();
     }

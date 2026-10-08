@@ -4,6 +4,7 @@ import 'package:note_sphere/models/note_model.dart';
 import 'package:note_sphere/models/task_model.dart';
 import 'package:note_sphere/utils/router.dart';
 import 'package:note_sphere/utils/theme_data.dart';
+import 'package:note_sphere/widgets/task_inherited_widget.dart';
 
 void main() async {
   // initialize Hive
@@ -25,11 +26,15 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
-      title: "NoteSphere",
-      debugShowCheckedModeBanner: false,
-      theme: ThemeClass.darkTheme,
-      routerConfig: AppRouter.router,
+    return TaskData(
+      tasks: [],
+      onTaskChanged: () {},
+      child: MaterialApp.router(
+        title: "NoteSphere",
+        debugShowCheckedModeBanner: false,
+        theme: ThemeClass.darkTheme,
+        routerConfig: AppRouter.router,
+      ),
     );
   }
 }
