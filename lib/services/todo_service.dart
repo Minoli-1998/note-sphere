@@ -69,4 +69,21 @@ class TodoService {
       error.toString();
     }
   }
+
+  // add a task
+  Future<void> addTask(Task task) async {
+    try {
+      // get all tasks
+      final List<dynamic> allTasks = await _myBox.get('tasks') ?? [];
+      final List<Task> tasks = allTasks.cast<Task>().toList();
+
+      // add the task in the list
+      tasks.add(task);
+
+      // save in box
+      _myBox.put("tasks", tasks);
+    } catch (error) {
+      error.toString();
+    }
+  }
 }

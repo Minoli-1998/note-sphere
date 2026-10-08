@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:note_sphere/helpers/snackbar.dart';
 import 'package:note_sphere/models/task_model.dart';
 import 'package:note_sphere/services/todo_service.dart';
 import 'package:note_sphere/utils/colors.dart';
@@ -17,6 +18,17 @@ class TasksPage extends StatefulWidget {
 class _TasksPageState extends State<TasksPage>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
+
+  // controller for text field
+  final TextEditingController _taskController = TextEditingController();
+
+  // dispose controllers
+  @override
+  void dispose() {
+    _taskController.dispose();
+    _tabController.dispose();
+    super.dispose();
+  }
 
   // tasks list variables
   late List<Task> allTasks = [];
@@ -59,6 +71,119 @@ class _TasksPageState extends State<TasksPage>
     });
   }
 
+  // add task
+  void _addTask() async {
+    try {
+      if (_taskController.text.isNotEmpty) {
+        Task newTask = Task(
+          title: _taskController.text,
+          date: DateTime.now(),
+          time: DateTime.now(),
+          isDone: false,
+        );
+
+        // add as a task using todoservice
+        await todoService.addTask(newTask);
+
+        // add to all tasks
+        setState(() {
+          allTasks.add(newTask);
+          incompletedTasks.add(newTask);
+        });
+
+        // displaying a message
+        if (context.mounted) {
+          AppHelpers.showSnackBarMessage(
+            context,
+            "New task added successfully",
+          );
+        }
+
+        // cleart text field
+        _taskController.clear();
+
+        Navigator.pop(context);
+      }
+    } catch (error) {
+      if (context.mounted) {
+        AppHelpers.showSnackBarMessage(context, "Failed to add new task");
+      }
+    }
+  }
+
+  // open dialog box
+  void openMessageModal(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          contentPadding: EdgeInsets.zero,
+          backgroundColor: AppColors.kCardColor,
+          title: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 20),
+            child: Text(
+              "Add Tasks",
+              style: AppTextStyles.appDescriptionLargeStyle.copyWith(
+                fontWeight: FontWeight.bold,
+                fontSize: 20,
+              ),
+              textAlign: TextAlign.left,
+            ),
+          ),
+          content: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: TextField(
+              controller: _taskController,
+              style: TextStyle(fontSize: 20, color: AppColors.kWhiteColor),
+              decoration: InputDecoration(
+                hintText: "Enter your Task",
+                hintStyle: AppTextStyles.appDescriptionSmallStyle,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+            ),
+          ),
+          actionsPadding: EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+          actionsAlignment: MainAxisAlignment.spaceBetween,
+          actions: [
+            // add task button
+            ElevatedButton(
+              onPressed: () {
+                _addTask();
+              },
+              style: ButtonStyle(
+                backgroundColor: WidgetStatePropertyAll(AppColors.kFabColor),
+                shape: WidgetStatePropertyAll(
+                  RoundedRectangleBorder(
+                    borderRadius: BorderRadiusGeometry.circular(100),
+                  ),
+                ),
+              ),
+              child: Text("Add Task", style: AppTextStyles.appButton),
+            ),
+
+            // cancel button
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              style: ButtonStyle(
+                backgroundColor: WidgetStatePropertyAll(AppColors.kFabColor),
+                shape: WidgetStatePropertyAll(
+                  RoundedRectangleBorder(
+                    borderRadius: BorderRadiusGeometry.circular(100),
+                  ),
+                ),
+              ),
+              child: Text("Cancel", style: AppTextStyles.appButton),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -92,7 +217,9 @@ class _TasksPageState extends State<TasksPage>
       ),
 
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () {
+          openMessageModal(context);
+        },
         shape: CircleBorder(side: BorderSide(color: Colors.white, width: 1)),
         child: Icon(Icons.add, color: AppColors.kWhiteColor, size: 30),
       ),
