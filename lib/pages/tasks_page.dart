@@ -100,8 +100,14 @@ class _TasksPageState extends State<TasksPage>
       body: TabBarView(
         controller: _tabController,
         children: [
-          TodoTab(incompletedTasks: incompletedTasks),
-          CompletedTab(completedTasks: completedTasks),
+          TodoTab(
+            incompletedTasks: incompletedTasks,
+            completedTasks: completedTasks,
+          ),
+          CompletedTab(
+            completedTasks: completedTasks,
+            inCompletedTasks: incompletedTasks,
+          ),
         ],
       ),
     );

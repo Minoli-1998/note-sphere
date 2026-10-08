@@ -8,11 +8,13 @@ import 'package:note_sphere/utils/text_styles.dart';
 class TaskCard extends StatefulWidget {
   final bool isCompleted;
   final Task incompletedTask;
+  final Function() onCheckBoxChanged;
 
   const TaskCard({
     super.key,
     required this.isCompleted,
     required this.incompletedTask,
+    required this.onCheckBoxChanged,
   });
 
   @override
@@ -53,7 +55,10 @@ class _TaskCardState extends State<TaskCard> {
             ],
           ),
 
-          Checkbox(value: widget.isCompleted, onChanged: (value) {}),
+          Checkbox(
+            value: widget.isCompleted,
+            onChanged: (value) => widget.onCheckBoxChanged(),
+          ),
         ],
       ),
     );

@@ -51,4 +51,22 @@ class TodoService {
 
     return [];
   }
+
+  // mark as done
+  Future<void> markAsDone(Task task) async {
+    try {
+      // get all tasks
+      final List<dynamic> allTasks = await _myBox.get('tasks') ?? [];
+      final List<Task> tasks = allTasks.cast<Task>().toList();
+
+      // get the task id that has same id as passed parameter
+      final int index = tasks.indexWhere((element) => element.id == task.id);
+      tasks[index] = task;
+
+      // save in box
+      await _myBox.put('tasks', tasks);
+    } catch (error) {
+      error.toString();
+    }
+  }
 }
