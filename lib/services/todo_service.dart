@@ -94,8 +94,11 @@ class TodoService {
       final List<dynamic> allTasks = await _myBox.get('tasks') ?? [];
       final List<Task> tasks = allTasks.cast<Task>().toList();
 
+      // get task with same id
+      final int index = tasks.indexWhere((element) => element.id == task.id);
+
       // remove from the list
-      tasks.remove(task);
+      tasks.removeAt(index);
 
       // save updated list in box
       await _myBox.put('tasks', tasks);

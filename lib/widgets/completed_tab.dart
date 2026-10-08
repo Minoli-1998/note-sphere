@@ -27,6 +27,7 @@ class _CompletedTabState extends State<CompletedTab> {
   Future<void> _markCompletedTaskAsNotDone(Task completedTask) async {
     try {
       final Task updatedTask = Task(
+        id: completedTask.id,
         title: completedTask.title,
         date: completedTask.date,
         time: completedTask.time,

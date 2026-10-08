@@ -24,12 +24,13 @@ class _TodoTabState extends State<TodoTab> {
   final TodoService todoService = TodoService();
 
   // updating incompleted task as completed
-  Future<void> _markIncompletedTaskAsDone(Task inCompletedask) async {
+  Future<void> _markIncompletedTaskAsDone(Task incompletedTask) async {
     try {
       final Task updatedTask = Task(
-        title: inCompletedask.title,
-        date: inCompletedask.date,
-        time: inCompletedask.time,
+        id: incompletedTask.id,
+        title: incompletedTask.title,
+        date: incompletedTask.date,
+        time: incompletedTask.time,
         isDone: true,
       );
 
@@ -42,7 +43,7 @@ class _TodoTabState extends State<TodoTab> {
 
       // remove from incompleted list
       setState(() {
-        widget.incompletedTasks.remove(inCompletedask);
+        widget.incompletedTasks.remove(incompletedTask);
         widget.completedTasks.add(updatedTask);
       });
 
