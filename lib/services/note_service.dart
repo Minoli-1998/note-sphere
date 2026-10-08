@@ -51,7 +51,7 @@ class NoteService {
 
     // check whether the notes are empty and a list of note
     // the type of notes is dynamic converting notes type dynamic to Note using cast
-    if (notes != null && notes is List<Note>) {
+    if (notes != null && notes is List<dynamic>) {
       return notes.cast<Note>().toList();
     }
 

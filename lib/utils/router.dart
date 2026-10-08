@@ -12,7 +12,7 @@ import 'package:note_sphere/pages/update_note_page.dart';
 class AppRouter {
   static final router = GoRouter(
     navigatorKey: GlobalKey<NavigatorState>(),
-    debugLogDiagnostics: true,
+    debugLogDiagnostics: false,
     initialLocation: "/",
     routes: [
       // home page
