@@ -76,11 +76,23 @@ class _TodoTabState extends State<TodoTab> {
               itemBuilder: (context, index) {
                 Task incomepleted = widget.incompletedTasks[index];
 
-                return TaskCard(
-                  isCompleted: false,
-                  incompletedTask: incomepleted,
-                  onCheckBoxChanged: () =>
-                      _markIncompletedTaskAsDone(incomepleted),
+                return Dismissible(
+                  key: ValueKey(incomepleted.id.toString()),
+                  direction: DismissDirection.startToEnd,
+                  onDismissed: (direction) {
+                    setState(() {
+                      widget.incompletedTasks.removeAt(index);
+                      todoService.deleteTask(incomepleted);
+                    });
+
+                    AppHelpers.showSnackBarMessage(context, "Task deleted");
+                  },
+                  child: TaskCard(
+                    isCompleted: false,
+                    incompletedTask: incomepleted,
+                    onCheckBoxChanged: () =>
+                        _markIncompletedTaskAsDone(incomepleted),
+                  ),
                 );
               },
             ),

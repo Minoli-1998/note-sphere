@@ -86,4 +86,21 @@ class TodoService {
       error.toString();
     }
   }
+
+  // delete a task
+  Future<void> deleteTask(Task task) async {
+    try {
+      // get all tasks from the tasks
+      final List<dynamic> allTasks = await _myBox.get('tasks') ?? [];
+      final List<Task> tasks = allTasks.cast<Task>().toList();
+
+      // remove from the list
+      tasks.remove(task);
+
+      // save updated list in box
+      await _myBox.put('tasks', tasks);
+    } catch (error) {
+      error.toString();
+    }
+  }
 }
